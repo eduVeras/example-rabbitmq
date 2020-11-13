@@ -19,6 +19,8 @@ namespace Publisher.Extensions
 
             services.AddSingleton<IMessagingFactory, MessagingFactory>();
 
+            services.AddHostedService<HostedService>();
+
             return services.AddHostedService<HostedService>();
         }
     }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Publisher.Interfaces;
 using Publisher.Model;
 using RabbitMQ.Client.Events;
+using System.Text.Json;
 
 namespace Publisher.Services
 {
@@ -37,8 +38,6 @@ namespace Publisher.Services
 
             consumer.Received += _messagingService.Dequeue(stoppingToken, async (raw, message) =>
             {
-
-
                 if (message == null)
                 {
                     return;
@@ -48,7 +47,20 @@ namespace Publisher.Services
                 {
                     try
                     {
+                        var content = JsonSerializer.Serialize(new PingPongExample()
+                        {
+                            Id = message.Id++,
+                            IsPing = true,
+                            Message = "Pong"
+                        });
 
+
+                        _messagingService.Queue(new Message()
+                        {
+                            Exchange = _messagingConfiguration.Publishing.Exchange.Name,
+                            RoutingKey = _messagingConfiguration.Publishing.Routingkey,
+                            Content = content
+                        });
 
                     }
                     catch (Exception ex)
@@ -72,6 +84,8 @@ namespace Publisher.Services
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             _executingTask = ExecuteAsync(_cancellationTokenSource.Token);
+
+            FirstPong();
 
             if (_executingTask.IsCompleted)
             {
@@ -99,16 +113,21 @@ namespace Publisher.Services
             _messagingFactory.Disconnect();
         }
 
-        public void FirstPing()
+        public void FirstPong()
         {
-            var startPing = new PingPongExample()
+            var startPong = new PingPongExample()
             {
                 Id = 1,
                 IsPing = true,
-                Message = "Hello World"
+                Message = "Pong"
             };
 
-            _messagingService.Queue(new Message());
+            _messagingService.Queue(new Message()
+            {
+                Exchange = _messagingConfiguration.Publishing.Exchange.Name,
+                RoutingKey = _messagingConfiguration.Publishing.Routingkey,
+                Content = JsonSerializer.Serialize(startPong)
+            });
         }
     }
 }
