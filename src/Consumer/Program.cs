@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Consumer.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -24,7 +25,9 @@ namespace Consumer
                     .ReadFrom.Configuration(config)
                     .CreateLogger();
             })
-            .ConfigureServices((hostContext, services) => { })
+            .ConfigureServices((hostContext, services) => {
+                services.Register(hostContext.Configuration);
+            })
             .UseSerilog()
             .Build();
 

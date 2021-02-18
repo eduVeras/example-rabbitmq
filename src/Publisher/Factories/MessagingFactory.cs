@@ -177,7 +177,7 @@ namespace Publisher.Factories
             _channel.QueueDeclare(_messaging.Publishing.Queue, true, false, false, new Dictionary<string, object>()
             {
                 {"x-dead-letter-exchange", _messaging.Publishing.Exchange.Name},
-                {"x-dead-letter-routing-key", _messaging.Publishing.Routingkey}
+                {"x-dead-letter-routing-key", _messaging.Publishing.Deadletter.Routingkey}
             });
 
             _logger.LogInformation("RABBITMQ | BINDING POSTING EXCHANGE AND QUEUE");

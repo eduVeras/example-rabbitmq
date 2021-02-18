@@ -40,7 +40,7 @@ namespace Publisher.Services
 
             var channel = _messagingFactory.Initialize();
 
-            return async (model, ea) =>
+            return (model, ea) =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -52,7 +52,7 @@ namespace Publisher.Services
 
                 _logger.LogDebug("MESSAGING | RAW MESSAGE: {raw}");
 
-                await Policy
+                Policy
                     .Handle<Exception>()
                     .Fallback((app) => { }, 
                         onFallback: (context, expcetion) =>
@@ -69,7 +69,7 @@ namespace Publisher.Services
 
                         _logger.LogDebug("MESSAGING | MESSAGE HAS BEEN NACKED");
 
-                    }).Execute(async () =>
+                    }).Execute(() =>
                     {
                         retries = Retries(ea);
 
@@ -77,7 +77,7 @@ namespace Publisher.Services
 
                         var message = JsonConvert.DeserializeObject<T>(raw);
 
-                        await callback.Invoke(raw, message).ConfigureAwait(false);
+                        callback.Invoke(raw, message).ConfigureAwait(false).GetAwaiter().GetResult();
 
                         _logger.LogDebug("MESSAGING | MESSAGE WILL BE ACKED");
 
@@ -86,6 +86,7 @@ namespace Publisher.Services
                         _logger.LogDebug("MESSAGING | MESSAGE HAS BEEN ACKED");
                     });
 
+                return Task.CompletedTask;
             };
         }
 

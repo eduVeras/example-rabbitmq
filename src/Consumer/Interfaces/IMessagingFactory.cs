@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using RabbitMQ.Client;
 
 namespace Consumer.Interfaces
 {
     public interface IMessagingFactory
     {
+        IModel Initialize();
+        void Disconnect();
     }
 }
