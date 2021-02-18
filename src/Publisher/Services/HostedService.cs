@@ -51,7 +51,7 @@ namespace Publisher.Services
                         {
                             Id = message.Id++,
                             IsPing = true,
-                            Message = "Pong"
+                            Message = $"Pong {message.Id}"
                         });
 
 
@@ -81,6 +81,8 @@ namespace Publisher.Services
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Inicilizando a aplicação Publisher");
+
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             _executingTask = ExecuteAsync(_cancellationTokenSource.Token);

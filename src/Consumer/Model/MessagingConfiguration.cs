@@ -24,6 +24,7 @@
         public string Queue { get; set; }
         public string Routingkey { get; set; }
         public Exchange Exchange { get; set; }
+        public Deadletter Deadletter { get; set; }
     }
 
     public class Deadletter

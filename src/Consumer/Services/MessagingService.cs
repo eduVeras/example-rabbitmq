@@ -50,9 +50,9 @@ namespace Consumer.Services
                 var raw = Encoding.UTF8.GetString(body);
                 var retries = 0;
 
-                _logger.LogDebug("MESSAGING | RAW MESSAGE: {raw}");
+                _logger.LogDebug("MESSAGING | RAW MESSAGE: {raw}", raw);
 
-                await Policy
+                Policy
                     .Handle<Exception>()
                     .Fallback((app) => { },
                         onFallback: (context, expcetion) =>
@@ -69,7 +69,7 @@ namespace Consumer.Services
 
                             _logger.LogDebug("MESSAGING | MESSAGE HAS BEEN NACKED");
 
-                        }).Execute(async () =>
+                        }).Execute(() =>
                         {
                             retries = Retries(ea);
 
@@ -77,7 +77,7 @@ namespace Consumer.Services
 
                             var message = JsonConvert.DeserializeObject<T>(raw);
 
-                            await callback.Invoke(raw, message).ConfigureAwait(false);
+                            callback.Invoke(raw, message).ConfigureAwait(false).GetAwaiter().GetResult();
 
                             _logger.LogDebug("MESSAGING | MESSAGE WILL BE ACKED");
 
